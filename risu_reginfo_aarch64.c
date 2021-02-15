@@ -30,7 +30,7 @@ const char * const arch_extra_help;
 #else
 
 /* Should we test SVE register state */
-static int test_sve;
+int test_sve;
 static const struct option extra_opts[] = {
     {"test-sve", required_argument, NULL, FIRST_ARCH_OPT },
     {0, 0, 0, 0}

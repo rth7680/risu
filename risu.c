@@ -53,7 +53,7 @@ static gzFile gz_trace_file;
 
 static sigjmp_buf jmpbuf;
 
-#define ARRAY_SIZE(x)	(sizeof(x) / sizeof((x)[0]))
+#define ARRAY_SIZE(x)  (sizeof(x) / sizeof((x)[0]))
 
 /* I/O functions */
 
@@ -323,7 +323,153 @@ static void apprentice_sigill(int sig, siginfo_t *si, void *uc)
     }
 }
 
-static void set_sigill_handler(void (*fn) (int, siginfo_t *, void *))
+typedef void sigill_handler(int, siginfo_t *, void *);
+
+#ifdef ARMIE_WORKAROUND
+void master_sigill_sve(int sig, siginfo_t *si, void *uc);
+void apprentice_sigill_sve(int sig, siginfo_t *si, void *uc);
+
+extern int test_sve;
+
+#define master_sigill     (test_sve ? master_sigill_sve : master_sigill)
+#define apprentice_sigill (test_sve ? apprentice_sigill_sve : apprentice_sigill)
+
+asm(".globl master_sigill_sve\n"
+"        .type master_sigill_sve, @function\n"
+"master_sigill_sve:\n"
+"        adr	x3, master_sigill\n"
+"        b	armie_workaround\n"
+);
+
+asm(".globl apprentice_sigill_sve\n"
+"        .type apprentice_sigill_sve, @function\n"
+"apprentice_sigill_sve:\n"
+"        adr	x3, apprentice_sigill\n"
+"        b	armie_workaround\n"
+);
+
+void armie_workaround(int sig, siginfo_t *si, void *ucv, sigill_handler *fn)
+{
+    /* Maximum size of sigframe state for sve. */
+    char buf[SVE_SIG_CONTEXT_SIZE(16) + sizeof(struct _aarch64_ctx)]
+        __attribute__((aligned(16)));
+    ucontext_t *uc = ucv;
+    struct sve_context *sve_ctx = (struct sve_context *)buf;
+    struct _aarch64_ctx *ctx, *end_ctx;
+    struct extra_context *extra_ctx;
+    unsigned long vl;
+
+    /* Save all sve state before any C code can clobber any state. */
+    asm volatile(
+        ".arch_extension sve\n\t"
+        "str z0, [%0]\n\t"
+        "str z1, [%0, #1, mul vl]\n\t"
+        "str z2, [%0, #2, mul vl]\n\t"
+        "str z3, [%0, #3, mul vl]\n\t"
+        "str z4, [%0, #4, mul vl]\n\t"
+        "str z5, [%0, #5, mul vl]\n\t"
+        "str z6, [%0, #6, mul vl]\n\t"
+        "str z7, [%0, #7, mul vl]\n\t"
+        "str z8, [%0, #8, mul vl]\n\t"
+        "str z9, [%0, #9, mul vl]\n\t"
+        "str z10, [%0, #10, mul vl]\n\t"
+        "str z11, [%0, #11, mul vl]\n\t"
+        "str z12, [%0, #12, mul vl]\n\t"
+        "str z13, [%0, #13, mul vl]\n\t"
+        "str z14, [%0, #14, mul vl]\n\t"
+        "str z15, [%0, #15, mul vl]\n\t"
+        "str z16, [%0, #16, mul vl]\n\t"
+        "str z17, [%0, #17, mul vl]\n\t"
+        "str z18, [%0, #18, mul vl]\n\t"
+        "str z19, [%0, #19, mul vl]\n\t"
+        "str z20, [%0, #20, mul vl]\n\t"
+        "str z21, [%0, #21, mul vl]\n\t"
+        "str z22, [%0, #22, mul vl]\n\t"
+        "str z23, [%0, #23, mul vl]\n\t"
+        "str z24, [%0, #24, mul vl]\n\t"
+        "str z25, [%0, #25, mul vl]\n\t"
+        "str z26, [%0, #26, mul vl]\n\t"
+        "str z27, [%0, #27, mul vl]\n\t"
+        "str z28, [%0, #28, mul vl]\n\t"
+        "str z29, [%0, #29, mul vl]\n\t"
+        "str z30, [%0, #30, mul vl]\n\t"
+        "str z31, [%0, #31, mul vl]\n\t"
+        "addvl %0,%0,#16\n\t"
+        "addvl %0,%0,#16\n\t"
+        "str p0, [%0]\n\t"
+        "str p1, [%0, #1, mul vl]\n\t"
+        "str p2, [%0, #2, mul vl]\n\t"
+        "str p3, [%0, #3, mul vl]\n\t"
+        "str p4, [%0, #4, mul vl]\n\t"
+        "str p5, [%0, #5, mul vl]\n\t"
+        "str p6, [%0, #6, mul vl]\n\t"
+        "str p7, [%0, #7, mul vl]\n\t"
+        "str p8, [%0, #8, mul vl]\n\t"
+        "str p9, [%0, #9, mul vl]\n\t"
+        "str p10, [%0, #10, mul vl]\n\t"
+        "str p11, [%0, #11, mul vl]\n\t"
+        "str p12, [%0, #12, mul vl]\n\t"
+        "str p13, [%0, #13, mul vl]\n\t"
+        "str p14, [%0, #14, mul vl]\n\t"
+        "str p15, [%0, #15, mul vl]\n\t"
+        "rdffr p0.b\n\t"
+        "str p0, [%0, #16, mul vl]\n\t"
+        "ldr p0, [%0]\n\t"
+        "addpl %0,%0,#17\n\t"
+        "rdvl %1,#1"
+	: "=r"(end_ctx), "=r"(vl)
+        : "0"(buf + SVE_SIG_REGS_OFFSET)
+        : "memory");
+
+    sve_ctx->head.magic = SVE_MAGIC;
+    sve_ctx->head.size = (void *)end_ctx - (void *)sve_ctx;
+    sve_ctx->vl = vl;
+
+    end_ctx->magic = 0;
+    end_ctx->size = 0;
+
+    /* Find space to add an EXTRA record pointing to our SVE record. */
+    ctx = (struct _aarch64_ctx *) &uc->uc_mcontext.__reserved[0];
+    extra_ctx = NULL;
+    while (1) {
+        switch (ctx->magic) {
+        case SVE_MAGIC:
+            /* Whee! We already have SVE state. */
+            goto done;
+        case EXTRA_MAGIC:
+            /* Hmmm. We won't be able to have 2 extras. */
+            extra_ctx = (struct extra_context *)ctx;
+            break;
+        case 0:
+            /*
+             * End of list.  If we saw an extra record, we can't add
+             * another, so all we can do is assume we are running under
+             * a kernel/emulator that properly supports SVE.
+             * We'll certainly find out for sure in reginfo_init().
+             */
+            if (extra_ctx) {
+                goto done;
+            }
+            extra_ctx = (struct extra_context *)ctx;
+            /* Make sure there's room in the primary frame. */
+            assert((void *)(extra_ctx + 1) < (void *)(&uc->uc_mcontext + 1));
+            goto found;
+        }
+        ctx = (void *)ctx + ctx->size;
+    }
+
+ found:
+    extra_ctx->head.magic = EXTRA_MAGIC;
+    extra_ctx->head.size = sizeof(*extra_ctx);
+    extra_ctx->datap = (uintptr_t)sve_ctx;
+    extra_ctx->size = (void *)(end_ctx + 1) - (void *)sve_ctx;
+
+ done:
+    fn(sig, si, uc);
+}
+#endif
+
+static void set_sigill_handler(sigill_handler *fn)
 {
     struct sigaction sa;
     memset(&sa, 0, sizeof(struct sigaction));
@@ -380,7 +526,7 @@ static int master(void)
 
     switch (res) {
     case RES_OK:
-        set_sigill_handler(&master_sigill);
+        set_sigill_handler(master_sigill);
         fprintf(stderr, "starting master image at 0x%"PRIxPTR"\n",
                 image_start_address);
         fprintf(stderr, "starting image\n");
@@ -432,7 +578,7 @@ static int apprentice(void)
 
     switch (res) {
     case RES_OK:
-        set_sigill_handler(&apprentice_sigill);
+        set_sigill_handler(apprentice_sigill);
         fprintf(stderr, "starting apprentice image at 0x%"PRIxPTR"\n",
                 image_start_address);
         fprintf(stderr, "starting image\n");
@@ -708,6 +854,7 @@ int main(int argc, char **argv)
     /* E.g. select requested SVE vector length. */
     arch_init();
 
+    // asm volatile (".inst 0x2520e020");
     if (ismaster) {
         return master();
     } else {
