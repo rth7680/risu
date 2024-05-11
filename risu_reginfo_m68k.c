@@ -55,13 +55,13 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc, void *siaddr)
     }
 }
 
-/* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal */
-int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
+/* reginfo_is_eq: compare the reginfo structs, returns true if equal */
+bool reginfo_is_eq(struct reginfo *m, struct reginfo *a)
 {
     int i;
 
     if (m->gregs[R_PS] != a->gregs[R_PS]) {
-        return 0;
+        return false;
     }
 
     for (i = 0; i < 16; i++) {
@@ -69,27 +69,27 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
             continue;
         }
         if (m->gregs[i] != a->gregs[i]) {
-            return 0;
+            return false;
         }
     }
 
     if (m->fpregs.f_pcr != a->fpregs.f_pcr) {
-        return 0;
+        return false;
     }
 
     if (m->fpregs.f_psr != a->fpregs.f_psr) {
-        return 0;
+        return false;
     }
 
     for (i = 0; i < 8; i++) {
         if (m->fpregs.f_fpregs[i][0] != a->fpregs.f_fpregs[i][0] ||
             m->fpregs.f_fpregs[i][1] != a->fpregs.f_fpregs[i][1] ||
             m->fpregs.f_fpregs[i][2] != a->fpregs.f_fpregs[i][2]) {
-            return 0;
+            return false;
         }
     }
 
-    return 1;
+    return true;
 }
 
 /* reginfo_dump: print state to a stream */

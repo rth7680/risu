@@ -117,8 +117,8 @@ uintptr_t get_pc(struct reginfo *ri);
 /* initialize structure from a ucontext */
 void reginfo_init(struct reginfo *ri, ucontext_t *uc, void *siaddr);
 
-/* return 1 if structs are equal, 0 otherwise. */
-int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2);
+/* return true if structs are equal, false otherwise. */
+bool reginfo_is_eq(struct reginfo *r1, struct reginfo *r2);
 
 /* print reginfo state to a stream */
 void reginfo_dump(struct reginfo *ri, FILE *f);

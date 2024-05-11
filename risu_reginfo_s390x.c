@@ -73,8 +73,8 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc, void *siaddr)
     memcpy(ri->fprs, &uc->uc_mcontext.fpregs.fprs, sizeof(ri->fprs));
 }
 
-/* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal */
-int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
+/* reginfo_is_eq: compare the reginfo structs */
+bool reginfo_is_eq(struct reginfo *m, struct reginfo *a)
 {
     return m->pc_offset == a->pc_offset &&
            m->fpc == a->fpc &&

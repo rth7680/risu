@@ -262,8 +262,8 @@ void reginfo_init(struct reginfo *ri, ucontext_t *uc, void *siaddr)
     }
 }
 
-/* reginfo_is_eq: compare the reginfo structs, returns nonzero if equal */
-int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
+/* reginfo_is_eq: compare the reginfo structs, returns true if equal */
+bool reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
 {
     return memcmp(r1, r2, reginfo_size(r1)) == 0;
 }
