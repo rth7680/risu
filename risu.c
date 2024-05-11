@@ -362,10 +362,9 @@ static void load_image(const char *imgfile)
     /* Map writable because we include the memory area for store
      * testing in the image.
      */
-    addr =
-        mmap(0, len, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE, fd,
-             0);
-    if (!addr) {
+    addr = mmap(0, len, PROT_READ | PROT_WRITE | PROT_EXEC,
+                MAP_PRIVATE, fd, 0);
+    if (addr == MAP_FAILED) {
         perror("mmap");
         exit(EXIT_FAILURE);
     }
