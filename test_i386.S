@@ -13,6 +13,7 @@
 
 /* Initialise the registers to avoid spurious mismatches */
 
+.text
 #ifdef __x86_64__
 #define BASE	%rax
 	lea	2f(%rip), BASE
@@ -71,7 +72,8 @@
 /* exit test */
 	ud1	%ecx, %eax
 
-	.p2align 16
+.data
+	.balign 16
 2:
 	.set	i, 0
 	.rept	256
