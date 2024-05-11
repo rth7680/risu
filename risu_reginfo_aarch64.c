@@ -183,6 +183,18 @@ static int sve_preg_is_eq(int vq, const void *p1, const void *p2)
     return memcmp(p1, p2, vq * 2) == 0;
 }
 
+static void sve_dump_zreg(FILE *f, int vq, const uint64_t *z)
+{
+    const char *pad = "";
+    int q;
+
+    for (q = 0; q < vq; q++) {
+        fprintf(f, "%s[%-2d] %016" PRIx64 "%016" PRIx64 "\n",
+                pad, q, z[2 * q + 1], z[2 * q]);
+        pad = "           "; /* 11 spaces */
+    }
+}
+
 static void sve_dump_preg(FILE *f, int vq, const uint16_t *p)
 {
     int q;
@@ -211,10 +223,10 @@ static void sve_dump_zreg_diff(FILE *f, int vq, const uint64_t *za,
         uint64_t zb0 = zb[2 * q], zb1 = zb[2 * q + 1];
 
         if (za0 != zb0 || za1 != zb1) {
-            fprintf(f, "%sq%-2d: %016" PRIx64 "%016" PRIx64
+            fprintf(f, "%s[%-2d]: %016" PRIx64 "%016" PRIx64
                     " vs %016" PRIx64 "%016" PRIx64"\n",
                     pad, q, za1, za0, zb1, zb0);
-            pad = "      ";
+            pad = "           "; /* 11 spaces */
         }
     }
 }
@@ -237,19 +249,14 @@ void reginfo_dump(struct reginfo *ri, FILE * f)
 
     if (ri->sve_vl) {
         int vq = sve_vq_from_vl(ri->sve_vl);
-        int q;
 
         fprintf(f, "  vl     : %d\n", ri->sve_vl);
 
         for (i = 0; i < SVE_NUM_ZREGS; i++) {
             uint64_t *z = reginfo_zreg(ri, vq, i);
 
-            fprintf(f, "  Z%-2d q%-2d: %016" PRIx64 "%016" PRIx64 "\n",
-                    i, 0, z[1], z[0]);
-            for (q = 1; q < vq; ++q) {
-                fprintf(f, "      q%-2d: %016" PRIx64 "%016" PRIx64 "\n",
-                        q, z[q * 2 + 1], z[q * 2]);
-            }
+            fprintf(f, "  Z%-2d    : ", i);
+            sve_dump_zreg(f, vq, z);
         }
 
         for (i = 0; i < SVE_NUM_PREGS + 1; i++) {
@@ -312,7 +319,7 @@ void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
     }
 
     if (m->sve_vl != a->sve_vl) {
-        fprintf(f, "  vl    : %d vs %d\n", m->sve_vl, a->sve_vl);
+        fprintf(f, "  vl     : %d vs %d\n", m->sve_vl, a->sve_vl);
     }
 
     if (m->sve_vl) {
@@ -323,7 +330,7 @@ void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
             uint64_t *za = reginfo_zreg(a, vq, i);
 
             if (!sve_zreg_is_eq(vq, zm, za)) {
-                fprintf(f, "  Z%-2d ", i);
+                fprintf(f, "  Z%-2d    : ", i);
                 sve_dump_zreg_diff(f, vq, zm, za);
             }
         }
