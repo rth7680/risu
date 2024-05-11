@@ -24,6 +24,15 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <string.h>
+#include <elf.h>
+
+/* TODO: Improve configure. */
+#ifdef __linux__
+#include <endian.h>
+#define HOST_BIG_ENDIAN  (__BYTE_ORDER == __BIG_ENDIAN)
+#else
+#error Need HOST_BIG_ENDIAN
+#endif
 
 #include "config.h"
 #include "risu.h"
@@ -346,8 +355,11 @@ static void load_image(const char *imgfile)
 {
     /* Load image file into memory as executable */
     struct stat st;
+    void *addr;
+    int fd;
+
     fprintf(stderr, "loading test image %s...\n", imgfile);
-    int fd = open(imgfile, O_RDONLY);
+    fd = open(imgfile, O_RDONLY);
     if (fd < 0) {
         fprintf(stderr, "failed to open image file %s\n", imgfile);
         exit(EXIT_FAILURE);
@@ -356,20 +368,55 @@ static void load_image(const char *imgfile)
         perror("fstat");
         exit(EXIT_FAILURE);
     }
-    size_t len = st.st_size;
-    void *addr;
 
     /* Map writable because we include the memory area for store
      * testing in the image.
      */
-    addr = mmap(0, len, PROT_READ | PROT_WRITE | PROT_EXEC,
+    addr = mmap(0, st.st_size, PROT_READ | PROT_WRITE | PROT_EXEC,
                 MAP_PRIVATE, fd, 0);
     if (addr == MAP_FAILED) {
         perror("mmap");
         exit(EXIT_FAILURE);
     }
     close(fd);
-    image_start = addr;
+
+    if (memcmp(addr, ELFMAG, SELFMAG) == 0) {
+        union {
+            unsigned char ident[EI_NIDENT];
+            Elf32_Ehdr h32;
+            Elf64_Ehdr h64;
+        } *e = addr;
+        size_t entry;
+
+        /*
+         * TODO: More complete parsing of ELF file, verify assumtion, namely:
+         * Single PT_LOAD covering the ELF header, code and data.
+         * For now, simply update image_start from the elf header.
+         */
+        if (e->ident[EI_DATA] !=
+            (HOST_BIG_ENDIAN ? ELFDATA2MSB : ELFDATA2LSB)) {
+            fprintf(stderr, "%s: Endian mismatch: EI_DATA = %x\n",
+                    imgfile, e->ident[EI_DATA]);
+            exit(1);
+        }
+
+        switch (e->ident[EI_CLASS]) {
+        case ELFCLASS32:
+            entry = e->h32.e_entry;
+            break;
+        case ELFCLASS64:
+            entry = e->h64.e_entry;
+            break;
+        default:
+            fprintf(stderr, "%s: Bad elf header: EI_CLASS = %x\n",
+                    imgfile, e->ident[EI_CLASS]);
+            exit(1);
+        }
+        image_start = addr + entry;
+    } else {
+        /* Raw binary image. */
+        image_start = addr;
+    }
     image_start_address = (uintptr_t) addr;
 }
 
