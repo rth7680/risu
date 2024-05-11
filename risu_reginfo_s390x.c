@@ -107,34 +107,30 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
     return !ferror(f);
 }
 
-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
 {
     int i;
 
     if (m->pc_offset != a->pc_offset) {
-        fprintf(f, "Mismatch: PC offset master: [%016lx] - PC offset apprentice: [%016lx]\n",
+        fprintf(f, "  PC     : %016lx vs %016lx\n",
                 m->pc_offset, a->pc_offset);
     }
 
     for (i = 0; i < 16; i++) {
         if (m->gprs[i] != a->gprs[i]) {
-            fprintf(f, "Mismatch: r%d master: [%016lx] - r%d apprentice: [%016lx]\n",
-                    i, m->gprs[i], i, a->gprs[i]);
+            fprintf(f, "  r%-2d    : %016lx vs %016lx\n",
+                    i, m->gprs[i], a->gprs[i]);
         }
     }
 
     for (i = 0; i < 16; i++) {
         if (*(uint64_t *)&m->fprs[i] != *(uint64_t *)&a->fprs[i]) {
-            fprintf(f, "Mismatch: f%d master: [%016lx] - f%d apprentice: [%016lx]\n",
-                    i, *(uint64_t *)&m->fprs[i],
-                    i, *(uint64_t *)&a->fprs[i]);
+            fprintf(f, "  f%-2d    : %016lx vs %016lx\n",
+                    i, *(uint64_t *)&m->fprs[i], *(uint64_t *)&a->fprs[i]);
         }
     }
 
     if (m->fpc != a->fpc) {
-        fprintf(f, "Mismatch: FPC master: [%08x] - FPC apprentice: [%08x]\n",
-                m->fpc, a->fpc);
+        fprintf(f, "  FPC    : %08x vs %08x\n", m->fpc, a->fpc);
     }
-
-    return !ferror(f);
 }

@@ -147,35 +147,35 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
     return !ferror(f);
 }
 
-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
+void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
 {
     int i;
+
     for (i = 0; i < 32; i++) {
         if (i == 1 || i == 13) {
             continue;
         }
-
         if (m->gregs[i] != a->gregs[i]) {
-            fprintf(f, "Mismatch: Register r%d\n", i);
-            fprintf(f, "master: [%lx] - apprentice: [%lx]\n",
+            fprintf(f, "%*s%d: %016lx vs %016lx\n",
+                    6 - (1 < 10 ? 1 : 2), "r", i,
                     m->gregs[i], a->gregs[i]);
         }
     }
 
     if (m->gregs[XER] != a->gregs[XER]) {
-        fprintf(f, "Mismatch: XER\n");
-        fprintf(f, "m: [%lx] != a: [%lx]\n", m->gregs[XER], a->gregs[XER]);
+        fprintf(f, "%6s: %016lx vs %016lx\n",
+                "xer", m->gregs[XER], a->gregs[XER]);
     }
 
     if (m->gregs[CCR] != a->gregs[CCR]) {
-        fprintf(f, "Mismatch: Cond. Register\n");
-        fprintf(f, "m: [%lx] != a: [%lx]\n", m->gregs[CCR], a->gregs[CCR]);
+        fprintf(f, "%6s: %016lx vs %016lx\n",
+                "ccr", m->gregs[CCR], a->gregs[CCR]);
     }
 
     for (i = 0; i < 32; i++) {
         if (m->fpregs[i] != a->fpregs[i]) {
-            fprintf(f, "Mismatch: Register f%d\n", i);
-            fprintf(f, "m: [%016lx] != a: [%016lx]\n",
+            fprintf(f, "%*s%d: %016lx vs %016lx\n",
+                    6 - (i < 10 ? 1 : 2), "f", i,
                     m->fpregs[i], a->fpregs[i]);
         }
     }
@@ -186,13 +186,12 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
             m->vrregs.vrregs[i][2] != a->vrregs.vrregs[i][2] ||
             m->vrregs.vrregs[i][3] != a->vrregs.vrregs[i][3]) {
 
-            fprintf(f, "Mismatch: Register vr%d\n", i);
-            fprintf(f, "m: [%x, %x, %x, %x] != a: [%x, %x, %x, %x]\n",
+            fprintf(f, "%*s%d: %08x%08x%08x%08x vs %08x%08x%08x%08x\n",
+                    6 - (i < 10 ? 1 : 2), "vr", i,
                     m->vrregs.vrregs[i][0], m->vrregs.vrregs[i][1],
                     m->vrregs.vrregs[i][2], m->vrregs.vrregs[i][3],
                     a->vrregs.vrregs[i][0], a->vrregs.vrregs[i][1],
                     a->vrregs.vrregs[i][2], a->vrregs.vrregs[i][3]);
         }
     }
-    return !ferror(f);
 }

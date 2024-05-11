@@ -275,15 +275,15 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
     return !ferror(f);
 }
 
-/* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
+void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
 {
     int i;
-    fprintf(f, "mismatch detail (master : apprentice):\n");
+
     if (m->faulting_insn != a->faulting_insn) {
-        fprintf(f, "  faulting insn mismatch %08x vs %08x\n",
+        fprintf(f, "  faulting insn: %08x vs %08x\n",
                 m->faulting_insn, a->faulting_insn);
     }
+
     for (i = 0; i < 31; i++) {
         if (m->regs[i] != a->regs[i]) {
             fprintf(f, "  X%-2d    : %016" PRIx64 " vs %016" PRIx64 "\n",
@@ -342,7 +342,7 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
                 sve_dump_preg_diff(f, vq, pm, pa);
             }
         }
-        return !ferror(f);
+        return;
     }
 
     for (i = 0; i < 32; i++) {
@@ -356,6 +356,4 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
                     i, mv[1], mv[0], av[1], av[0]);
         }
     }
-
-    return !ferror(f);
 }

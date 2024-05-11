@@ -195,18 +195,17 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
     return !ferror(f);
 }
 
-/* reginfo_dump_mismatch: print mismatch details to a stream, ret nonzero=ok */
-int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
+/* reginfo_dump_mismatch: print mismatch details to a stream */
+void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
 {
     int i;
-    fprintf(f, "mismatch detail (master : apprentice):\n");
 
     if (m->vl != a->vl) {
-        fprintf(f, "  vl mismatch %08lx vs %08lx\n", m->vl, a->vl);
+        fprintf(f, "  vl     : %08lx vs %08lx\n", m->vl, a->vl);
     }
 
     if (m->faulting_insn != a->faulting_insn) {
-        fprintf(f, "  faulting insn mismatch %08x vs %08x\n",
+        fprintf(f, "  insn   : %08x vs %08x\n",
                 m->faulting_insn, a->faulting_insn);
     }
     /* r2:tp, r3:sp */
@@ -263,6 +262,4 @@ int reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE * f)
             }
         }
     }
-
-    return !ferror(f);
 }
