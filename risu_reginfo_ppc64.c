@@ -78,7 +78,7 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
         return 0;
     }
 
-    if ((m->gregs[CCR] & 0x10) != (a->gregs[CCR] & 0x10)) {
+    if (m->gregs[CCR] != a->gregs[CCR]) {
         return 0;
     }
 
