@@ -268,12 +268,12 @@ bool reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
     return memcmp(r1, r2, reginfo_size(r1)) == 0;
 }
 
-static int sve_zreg_is_eq(int vq, const void *z1, const void *z2)
+static bool sve_zreg_is_eq(int vq, const void *z1, const void *z2)
 {
     return memcmp(z1, z2, vq * 16) == 0;
 }
 
-static int sve_preg_is_eq(int vq, const void *p1, const void *p2)
+static bool sve_preg_is_eq(int vq, const void *p1, const void *p2)
 {
     return memcmp(p1, p2, vq * 2) == 0;
 }
