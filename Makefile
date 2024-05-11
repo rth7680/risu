@@ -22,7 +22,8 @@ ALL_CFLAGS = -Wall -D_GNU_SOURCE -DARCH=$(ARCH) -U$(ARCH) $(BUILD_INC) $(CFLAGS)
 PROG=risu
 SRCS=risu.c comms.c risu_$(ARCH).c risu_reginfo_$(ARCH).c
 HDRS=risu.h risu_reginfo_$(ARCH).h
-BINS=test_$(ARCH).bin
+BINO=test_$(ARCH).o
+BINE=test_$(ARCH).elf
 
 # For dumping test patterns
 RISU_BINS=$(wildcard *.risu.bin)
@@ -30,7 +31,7 @@ RISU_ASMS=$(patsubst %.bin,%.asm,$(RISU_BINS))
 
 OBJS=$(SRCS:.c=.o)
 
-all: $(PROG) $(BINS)
+all: $(PROG) $(BINE)
 
 dump: $(RISU_ASMS)
 
@@ -43,17 +44,17 @@ $(PROG): $(OBJS)
 %.o: %.c $(HDRS)
 	$(CC) $(CPPFLAGS) $(ALL_CFLAGS) -o $@ -c $<
 
-%_$(ARCH).bin: %_$(ARCH).elf
-	$(OBJCOPY) -O binary $< $@
+%_$(ARCH).o: %_$(ARCH).s
+	$(CC) -o $@ -c $<
 
-%_$(ARCH).elf: %_$(ARCH).s
-	$(AS) -o $@ $<
-
-%_$(ARCH).elf: %_$(ARCH).S
+%_$(ARCH).o: %_$(ARCH).S
 	$(CC) $(CPPFLAGS) -o $@ -c $<
 
+%_$(ARCH).elf: test.ld %_$(ARCH).o
+	$(LD) -o $@ -T $^
+
 clean:
-	rm -f $(PROG) $(OBJS) $(BINS)
+	rm -f $(PROG) $(OBJS) $(BINO) $(BINE)
 
 distclean: clean
 	rm -f config.h Makefile.in

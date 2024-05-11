@@ -80,6 +80,6 @@ fmov d31, #31.0
 /* do compare.
  * The manual says instr with bits (28,27) == 0 0 are UNALLOCATED
  */
-.int 0x00005af0
+.inst 0x00005af0
 /* exit test */
-.int 0x00005af1
+.inst 0x00005af1
