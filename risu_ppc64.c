@@ -11,9 +11,8 @@
  *     based on Peter Maydell's risu_arm.c
  *****************************************************************************/
 
-#include <sys/user.h>
-
 #include "risu.h"
+#include <sys/user.h>
 
 void advance_pc(void *vuc)
 {
