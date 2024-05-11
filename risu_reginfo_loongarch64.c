@@ -159,8 +159,8 @@ int reginfo_is_eq(struct reginfo *r1, struct reginfo *r2)
     return !memcmp(r1, r2, sizeof(*r1));
 }
 
-/* reginfo_dump: print state to a stream, returns nonzero on success */
-int reginfo_dump(struct reginfo *ri, FILE * f)
+/* reginfo_dump: print state to a stream */
+void reginfo_dump(struct reginfo *ri, FILE * f)
 {
     int i;
     fprintf(f, "  faulting insn %08x\n", ri->faulting_insn);
@@ -191,8 +191,6 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
             fprintf(f, "  vreg%-2d    : %016lx\n", i, ri->vregs[4 * i]);
         }
     }
-
-    return !ferror(f);
 }
 
 /* reginfo_dump_mismatch: print mismatch details to a stream */

@@ -82,8 +82,8 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
            memcmp(&m->fprs, &a->fprs, sizeof(m->fprs)) == 0;
 }
 
-/* reginfo_dump: print state to a stream, returns nonzero on success */
-int reginfo_dump(struct reginfo *ri, FILE * f)
+/* reginfo_dump: print state to a stream */
+void reginfo_dump(struct reginfo *ri, FILE * f)
 {
     int i;
 
@@ -103,8 +103,6 @@ int reginfo_dump(struct reginfo *ri, FILE * f)
                 i + 8, *(uint64_t *)&ri->fprs[i + 8]);
     }
     fprintf(f, "\tFPC: %8x\n\n", ri->fpc);
-
-    return !ferror(f);
 }
 
 void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
