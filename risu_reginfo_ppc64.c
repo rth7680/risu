@@ -75,38 +75,29 @@ void reginfo_dump(struct reginfo *ri, FILE * f)
 {
     int i;
 
-    fprintf(f, "  faulting insn 0x%x\n", ri->faulting_insn);
-    fprintf(f, "  prev insn     0x%x\n", ri->prev_insn);
-    fprintf(f, "  prev addr    0x%" PRIx64 "\n\n", ri->nip);
-
-    for (i = 0; i < 16; i++) {
-        fprintf(f, "\tr%2d: %16lx\tr%2d: %16lx\n", i, ri->gregs[i],
-                i + 16, ri->gregs[i + 16]);
-    }
-
-    fprintf(f, "\n");
-    fprintf(f, "\tnip    : %16lx\n", ri->gregs[32]);
-    fprintf(f, "\tmsr    : %16lx\n", ri->gregs[33]);
-    fprintf(f, "\torig r3: %16lx\n", ri->gregs[34]);
-    fprintf(f, "\tctr    : %16lx\n", ri->gregs[35]);
-    fprintf(f, "\tlnk    : %16lx\n", ri->gregs[36]);
-    fprintf(f, "\txer    : %16lx\n", ri->gregs[37]);
-    fprintf(f, "\tccr    : %16lx\n", ri->gregs[38]);
-    fprintf(f, "\tmq     : %16lx\n", ri->gregs[39]);
-    fprintf(f, "\ttrap   : %16lx\n", ri->gregs[40]);
-    fprintf(f, "\tdar    : %16lx\n", ri->gregs[41]);
-    fprintf(f, "\tdsisr  : %16lx\n", ri->gregs[42]);
-    fprintf(f, "\tresult : %16lx\n", ri->gregs[43]);
-    fprintf(f, "\tdscr   : %16lx\n\n", ri->gregs[44]);
-
-    for (i = 0; i < 16; i++) {
-        fprintf(f, "\tf%2d: %016lx\tf%2d: %016lx\n", i, ri->fpregs[i],
-                i + 16, ri->fpregs[i + 16]);
-    }
-    fprintf(f, "\tfpscr: %016lx\n\n", ri->fpscr);
+    fprintf(f, "%6s: %08x\n", "insn", ri->faulting_insn);
+    fprintf(f, "%6s: %016lx\n", "pc", ri->nip);
 
     for (i = 0; i < 32; i++) {
-        fprintf(f, "vr%02d: %8x, %8x, %8x, %8x\n", i,
+        fprintf(f, "%*s%d: %016lx%s",
+                6 - (i < 10 ? 1 : 2), "r", i, ri->gregs[i],
+                i & 1 ? "\n" : "  ");
+    }
+
+    fprintf(f, "%6s: %016lx  %6s: %016lx\n",
+            "xer", ri->gregs[XER],
+            "ccr", ri->gregs[CCR]);
+
+    for (i = 0; i < 32; i++) {
+        fprintf(f, "%*s%d: %016lx%s",
+                6 - (i < 10 ? 1 : 2), "f", i, ri->fpregs[i],
+                i & 1 ? "\n" : "  ");
+    }
+    fprintf(f, "%6s: %016lx\n", "fpscr", ri->fpscr);
+
+    for (i = 0; i < 32; i++) {
+        fprintf(f, "%*s%d: %08x %08x %08x %08x\n",
+                6 - (i < 10 ? 1 : 2), "vr", i,
                 ri->vrregs.vrregs[i][0], ri->vrregs.vrregs[i][1],
                 ri->vrregs.vrregs[i][2], ri->vrregs.vrregs[i][3]);
     }
