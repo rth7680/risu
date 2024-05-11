@@ -44,16 +44,16 @@ int reginfo_size(struct reginfo *ri)
 /* reginfo_init: initialize with a ucontext */
 void reginfo_init(struct reginfo *ri, ucontext_t *uc, void *siaddr)
 {
-    int i;
-
     memset(ri, 0, sizeof(*ri));
 
     ri->faulting_insn = *((uint32_t *) uc->uc_mcontext.regs->nip);
     ri->nip = uc->uc_mcontext.regs->nip - image_start_address;
 
-    for (i = 0; i < NGREG; i++) {
-        ri->gregs[i] = uc->uc_mcontext.gp_regs[i];
-    }
+    memcpy(ri->gregs, uc->uc_mcontext.gp_regs, 32 * sizeof(ri->gregs[0]));
+    ri->gregs[1] = 0xdeadbeefdeadbeef;   /* sp */
+    ri->gregs[13] = 0xdeadbeefdeadbeef;  /* tp */
+    ri->gregs[XER] = uc->uc_mcontext.gp_regs[XER];
+    ri->gregs[CCR] = uc->uc_mcontext.gp_regs[CCR];
 
     memcpy(ri->fpregs, uc->uc_mcontext.fp_regs, 32 * sizeof(double));
     ri->fpscr = uc->uc_mcontext.fp_regs[32];
@@ -69,10 +69,6 @@ int reginfo_is_eq(struct reginfo *m, struct reginfo *a)
 {
     int i;
     for (i = 0; i < 32; i++) {
-        if (i == 1 || i == 13) {
-            continue;
-        }
-
         if (m->gregs[i] != a->gregs[i]) {
             return 0;
         }
@@ -150,9 +146,6 @@ void reginfo_dump_mismatch(struct reginfo *m, struct reginfo *a, FILE *f)
     int i;
 
     for (i = 0; i < 32; i++) {
-        if (i == 1 || i == 13) {
-            continue;
-        }
         if (m->gregs[i] != a->gregs[i]) {
             fprintf(f, "%*s%d: %016lx vs %016lx\n",
                     6 - (1 < 10 ? 1 : 2), "r", i,
