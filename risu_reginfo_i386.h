@@ -12,6 +12,8 @@
 #ifndef RISU_REGINFO_I386_H
 #define RISU_REGINFO_I386_H
 
+typedef ucontext_t host_context_t;
+
 struct avx512_reg {
     uint64_t q[8];
 };

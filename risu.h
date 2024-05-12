@@ -68,7 +68,7 @@ typedef enum {
 
 /* This is the data structure we pass over the socket for OP_COMPARE
  * and OP_TESTEND. It is a simplified and reduced subset of what can
- * be obtained with a ucontext_t*, and is architecture specific
+ * be obtained with a ucontext_t, and is architecture specific
  * (defined in risu_reginfo_*.h).
  */
 struct reginfo;
@@ -93,14 +93,14 @@ void send_response_byte(int sock, int resp);
 
 /* Interface provided by CPU-specific code: */
 
-/* Move the PC past this faulting insn by adjusting ucontext. */
-void advance_pc(void *uc);
+/* Move the PC past this faulting insn by adjusting signal context. */
+void advance_pc(host_context_t *hc);
 
-/* Set the parameter register in a ucontext_t to the specified value.
+/*
+ * Set the parameter register in a host_context_t to the specified value.
  * (32-bit targets can ignore high 32 bits.)
- * vuc is a ucontext_t* cast to void*.
  */
-void set_ucontext_paramreg(void *vuc, uint64_t value);
+void set_ucontext_paramreg(host_context_t *hc, uint64_t value);
 
 /* Return the value of the parameter register from a reginfo. */
 uint64_t get_reginfo_paramreg(struct reginfo *ri);
@@ -114,8 +114,8 @@ RisuOp get_risuop(struct reginfo *ri);
 /* Return the PC from a reginfo */
 uintptr_t get_pc(struct reginfo *ri);
 
-/* initialize structure from a ucontext */
-void reginfo_init(struct reginfo *ri, ucontext_t *uc, void *siaddr);
+/* initialize structure from a host_context_t. */
+void reginfo_init(struct reginfo *ri, host_context_t *hc, void *siaddr);
 
 /* return true if structs are equal, false otherwise. */
 bool reginfo_is_eq(struct reginfo *r1, struct reginfo *r2);

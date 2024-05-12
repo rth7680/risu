@@ -97,10 +97,9 @@ static int parse_extcontext(struct sigcontext *sc, struct extctx_layout *extctx)
 }
 
 /* reginfo_init: initialize with a ucontext */
-void reginfo_init(struct reginfo *ri, ucontext_t *context, void *siaddr)
+void reginfo_init(struct reginfo *ri, host_context_t *uc, void *siaddr)
 {
     int i;
-    struct ucontext *uc = (struct ucontext *)context;
     struct extctx_layout extctx;
 
     memset(&extctx, 0, sizeof(struct extctx_layout));

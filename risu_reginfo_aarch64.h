@@ -15,6 +15,8 @@
 
 #include <signal.h>
 
+typedef ucontext_t host_context_t;
+
 /* The kernel headers set this based on future arch extensions.
    The current arch maximum is 16.  Save space below.  */
 #undef SVE_VQ_MAX

@@ -9,6 +9,8 @@
 #ifndef RISU_REGINFO_M68K_H
 #define RISU_REGINFO_M68K_H
 
+typedef ucontext_t host_context_t;
+
 struct reginfo {
     uint32_t faulting_insn;
     uint32_t pc;

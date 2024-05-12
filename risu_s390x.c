@@ -13,7 +13,7 @@
 
 #include "risu.h"
 
-void advance_pc(void *vuc)
+void advance_pc(ucontext_t *uc)
 {
     /*
      * Note: The PSW address already points to the next instruction
@@ -21,9 +21,8 @@ void advance_pc(void *vuc)
      */
 }
 
-void set_ucontext_paramreg(void *vuc, uint64_t value)
+void set_ucontext_paramreg(ucontext_t *uc, uint64_t value)
 {
-    ucontext_t *uc = vuc;
     uc->uc_mcontext.gregs[0] = value;
 }
 

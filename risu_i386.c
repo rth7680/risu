@@ -16,10 +16,8 @@
 #include "risu.h"
 #include "risu_reginfo_i386.h"
 
-void advance_pc(void *vuc)
+void advance_pc(ucontext_t *uc)
 {
-    ucontext_t *uc = (ucontext_t *) vuc;
-
     /*
      * We assume that this is UD1 as per get_risuop below.
      * This would need tweaking if we want to test expected undefs.
@@ -27,9 +25,8 @@ void advance_pc(void *vuc)
     uc->uc_mcontext.gregs[REG_E(IP)] += 3;
 }
 
-void set_ucontext_paramreg(void *vuc, uint64_t value)
+void set_ucontext_paramreg(ucontext_t *uc, uint64_t value)
 {
-    ucontext_t *uc = (ucontext_t *) vuc;
     uc->uc_mcontext.gregs[REG_E(AX)] = value;
 }
 
