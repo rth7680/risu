@@ -38,16 +38,13 @@ int insnsize(ucontext_t *uc)
     return 4;
 }
 
-void advance_pc(void *vuc)
+void advance_pc(ucontext_t *uc)
 {
-    ucontext_t *uc = vuc;
     uc->uc_mcontext.arm_pc += insnsize(uc);
 }
 
-
-void set_ucontext_paramreg(void *vuc, uint64_t value)
+void set_ucontext_paramreg(ucontext_t *uc, uint64_t value)
 {
-    ucontext_t *uc = vuc;
     uc->uc_mcontext.arm_r0 = value;
 }
 

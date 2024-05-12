@@ -12,6 +12,8 @@
 #ifndef RISU_REGINFO_S390X_H
 #define RISU_REGINFO_S390X_H
 
+typedef ucontext_t host_context_t;
+
 struct reginfo {
     uint64_t psw_mask;
     uint64_t pc_offset;

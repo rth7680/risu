@@ -14,15 +14,13 @@
 #include "risu.h"
 #include <sys/user.h>
 
-void advance_pc(void *vuc)
+void advance_pc(ucontext_t *uc)
 {
-    ucontext_t *uc = (ucontext_t *) vuc;
     uc->uc_mcontext.regs->nip += 4;
 }
 
-void set_ucontext_paramreg(void *vuc, uint64_t value)
+void set_ucontext_paramreg(ucontext_t *uc, uint64_t value)
 {
-    ucontext_t *uc = vuc;
     uc->uc_mcontext.gp_regs[0] = value;
 }
 

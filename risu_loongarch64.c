@@ -15,15 +15,13 @@
 
 #include "risu.h"
 
-void advance_pc(void *vuc)
+void advance_pc(host_context_t *uc)
 {
-    struct ucontext *uc = vuc;
     uc->uc_mcontext.sc_pc += 4;
 }
 
-void set_ucontext_paramreg(void *vuc, uint64_t value)
+void set_ucontext_paramreg(host_context_t *uc, uint64_t value)
 {
-    struct ucontext *uc = vuc;
     uc->uc_mcontext.sc_regs[4] = value;
 }
 

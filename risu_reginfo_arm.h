@@ -13,6 +13,8 @@
 #ifndef RISU_REGINFO_ARM_H
 #define RISU_REGINFO_ARM_H
 
+typedef ucontext_t host_context_t;
+
 struct reginfo {
     uint64_t fpregs[32];
     uint32_t faulting_insn;

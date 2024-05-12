@@ -12,6 +12,9 @@
 #ifndef RISU_REGINFO_LOONGARCH64_H
 #define RISU_REGINFO_LOONGARCH64_H
 
+/* From kernel <asm/ucontext.h> not libc <ucontext.h>. */
+typedef struct ucontext host_context_t;
+
 struct reginfo {
     uint64_t regs[32];
     uint64_t pc;
