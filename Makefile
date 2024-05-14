@@ -53,6 +53,9 @@ $(PROG): $(OBJS)
 %_$(ARCH).elf: test.ld %_$(ARCH).o
 	$(LD) -o $@ -T $^
 
+test_sparc64.o: test_sparc64.s
+	$(AS) -Av9a -o $@ $<
+
 clean:
 	rm -f $(PROG) $(OBJS) $(BINO) $(BINE)
 

@@ -62,6 +62,8 @@ guess_arch() {
         ARCH="ppc64"
     elif check_define __s390x__ ; then
         ARCH="s390x"
+    elif check_define __sparc__ && check_define __arch64__ ; then
+        ARCH="sparc64"
     else
         echo "This cpu is not supported by risu. Try -h. " >&2
         exit 1
