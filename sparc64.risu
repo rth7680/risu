@@ -28,3 +28,94 @@ XOR_r           SPARC 10 rd:5 0 cc:1 0011 rs1:5 0 00000000 rs2:5 \
     !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
 XOR_i           SPARC 10 rd:5 0 cc:1 0011 rs1:5 1 imm:13 \
     !constraints { reg_ok($rd) && reg_ok($rs1); }
+
+#
+# VIS1
+#
+
+EDGE8cc         VIS1 10 rd:5 110110 rs1:5 0 0000 0000 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE8Lcc        VIS1 10 rd:5 110110 rs1:5 0 0000 0010 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE16cc        VIS1 10 rd:5 110110 rs1:5 0 0000 0100 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE16Lcc       VIS1 10 rd:5 110110 rs1:5 0 0000 0110 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE32cc        VIS1 10 rd:5 110110 rs1:5 0 0000 1000 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE32Lcc       VIS1 10 rd:5 110110 rs1:5 0 0000 1010 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+
+ARRAY8          VIS1 10 rd:5 110110 rs1:5 0 0001 0000 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+ARRAY16         VIS1 10 rd:5 110110 rs1:5 0 0001 0010 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+ARRAY32         VIS1 10 rd:5 110110 rs1:5 0 0001 0100 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+
+FZEROd          VIS1 10 rd:5 110110 00000 0 0110 0000 00000
+FZEROs          VIS1 10 rd:5 110110 00000 0 0110 0001 00000
+FONEd           VIS1 10 rd:5 110110 00000 0 0110 1110 00000
+FONEs           VIS1 10 rd:5 110110 00000 0 0110 1111 00000
+
+FSRC1d          VIS1 10 rd:5 110110 rs1:5 0 0111 0100 00000
+FSRC1s          VIS1 10 rd:5 110110 rs1:5 0 0111 0101 00000
+FSRC2d          VIS1 10 rd:5 110110 00000 0 0111 1000 rs2:5
+FSRC2s          VIS1 10 rd:5 110110 00000 0 0111 1001 rs2:5
+FNOT1d          VIS1 10 rd:5 110110 rs1:5 0 0110 1010 00000
+FNOT1s          VIS1 10 rd:5 110110 rs1:5 0 0110 1011 00000
+FNOT2d          VIS1 10 rd:5 110110 00000 0 0110 0110 rs2:5
+FNOT2s          VIS1 10 rd:5 110110 00000 0 0110 0111 rs2:5
+
+FPADD16         VIS1 10 rd:5 110110 rs1:5 0 0101 0000 rs2:5
+FPADD16s        VIS1 10 rd:5 110110 rs1:5 0 0101 0001 rs2:5
+FPADD32         VIS1 10 rd:5 110110 rs1:5 0 0101 0010 rs2:5
+FPADD32s        VIS1 10 rd:5 110110 rs1:5 0 0101 0011 rs2:5
+FPSUB16         VIS1 10 rd:5 110110 rs1:5 0 0101 0100 rs2:5
+FPSUB16s        VIS1 10 rd:5 110110 rs1:5 0 0101 0101 rs2:5
+FPSUB32         VIS1 10 rd:5 110110 rs1:5 0 0101 0110 rs2:5
+FPSUB32s        VIS1 10 rd:5 110110 rs1:5 0 0101 0111 rs2:5
+
+FNORd           VIS1 10 rd:5 110110 rs1:5 0 0110 0010 rs2:5
+FNORs           VIS1 10 rd:5 110110 rs1:5 0 0110 0011 rs2:5
+FANDNOT1d       VIS1 10 rd:5 110110 rs1:5 0 0110 0100 rs2:5
+FANDNOT1s       VIS1 10 rd:5 110110 rs1:5 0 0110 0101 rs2:5
+FANDNOT2d       VIS1 10 rd:5 110110 rs1:5 0 0110 1000 rs2:5
+FANDNOT2s       VIS1 10 rd:5 110110 rs1:5 0 0110 1001 rs2:5
+FXORd           VIS1 10 rd:5 110110 rs1:5 0 0110 1100 rs2:5
+FXORs           VIS1 10 rd:5 110110 rs1:5 0 0110 1101 rs2:5
+FNANDd          VIS1 10 rd:5 110110 rs1:5 0 0110 1110 rs2:5
+FNANDs          VIS1 10 rd:5 110110 rs1:5 0 0110 1111 rs2:5
+FANDd           VIS1 10 rd:5 110110 rs1:5 0 0111 0000 rs2:5
+FANDs           VIS1 10 rd:5 110110 rs1:5 0 0111 0001 rs2:5
+FXNORd          VIS1 10 rd:5 110110 rs1:5 0 0111 0010 rs2:5
+FXNORs          VIS1 10 rd:5 110110 rs1:5 0 0111 0011 rs2:5
+FORNOT1d        VIS1 10 rd:5 110110 rs1:5 0 0111 0110 rs2:5
+FORNOT1s        VIS1 10 rd:5 110110 rs1:5 0 0111 0111 rs2:5
+FORNOT2d        VIS1 10 rd:5 110110 rs1:5 0 0111 1010 rs2:5
+FORNOT2s        VIS1 10 rd:5 110110 rs1:5 0 0111 1011 rs2:5
+FORd            VIS1 10 rd:5 110110 rs1:5 0 0111 1100 rs2:5
+FORs            VIS1 10 rd:5 110110 rs1:5 0 0111 1101 rs2:5
+
+FMUL8x16        VIS1 10 rd:5 110110 rs1:5 0 0011 0001 rs2:5
+FMUL8x16AU      VIS1 10 rd:5 110110 rs1:5 0 0011 0011 rs2:5
+FMUL8x16AL      VIS1 10 rd:5 110110 rs1:5 0 0011 0101 rs2:5
+FMUL8SUx16      VIS1 10 rd:5 110110 rs1:5 0 0011 0110 rs2:5
+FMUL8ULx16      VIS1 10 rd:5 110110 rs1:5 0 0011 0111 rs2:5
+FMULD8SUx16     VIS1 10 rd:5 110110 rs1:5 0 0011 1000 rs2:5
+FMULD8ULx16     VIS1 10 rd:5 110110 rs1:5 0 0011 1001 rs2:5
+
+FPACK32         VIS1 10 rd:5 110110 rs1:5 0 0011 1010 rs2:5
+FPACK16         VIS1 10 rd:5 110110 00000 0 0011 1011 rs2:5
+FPACKFIX        VIS1 10 rd:5 110110 00000 0 0011 1101 rs2:5
+PDIST           VIS1 10 rd:5 110110 rs1:5 0 0011 1110 rs2:5
+
+FPMERGE         VIS1 10 rd:5 110110 rs1:5 0 0100 1011 rs2:5
+FEXPAND         VIS1 10 rd:5 110110 00000 0 0100 1101 rs2:5
+
+# %gsr not handled by risu
+# ALIGNADDR     VIS1 10 rd:5 110110 rs1:5 0 0001 1000 rs2:5 \
+#     !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+# ALIGNADDRL    VIS1 10 rd:5 110110 rs1:5 0 0001 1010 rs2:5 \
+#     !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+# FALIGNDATAg   VIS1 10 rd:5 110110 rs1:5 0 0100 1000 rs2:5
