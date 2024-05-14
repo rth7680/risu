@@ -30,6 +30,8 @@
 #ifdef __linux__
 #include <endian.h>
 #define HOST_BIG_ENDIAN  (__BYTE_ORDER == __BIG_ENDIAN)
+#elif defined(__sparc__)
+#define HOST_BIG_ENDIAN  1
 #else
 #error Need HOST_BIG_ENDIAN
 #endif
