@@ -26,7 +26,8 @@ BEGIN {
     our @EXPORT = qw(open_bin close_bin set_endian insn32 insn16 $bytecount
                    progress_start progress_update progress_end
                    eval_with_fields is_pow_of_2 sextract ctz
-                   dump_insn_details);
+                   dump_insn_details
+                   open_asm close_asm assemble_and_link);
 }
 
 our $bytecount;
@@ -64,6 +65,53 @@ sub insn16($)
     my ($insn) = @_;
     print BIN pack($bigendian ? "n" : "v", $insn);
     $bytecount += 2;
+}
+
+sub open_asm($)
+{
+    my ($basename) = @_;
+    my $fname = $basename . ".s";
+    open(ASM, ">", $fname) or die "can't open $fname: $!";
+    select ASM;
+}
+
+sub close_asm
+{
+    close(ASM) or die "can't close asm file: $!";
+    select STDOUT;
+}
+
+sub assemble_and_link($$$@)
+{
+    my ($basename, $cross_prefix, $keep, @asflags) = @_;
+    my $asmfile = $basename . ".s";
+    my $ldfile = $basename . ".ld";
+    my $objfile = $basename . ".o";
+
+    open(LD, ">", $ldfile) or die "can't open $ldfile: $!";
+    print LD '
+        ENTRY(start)
+        PHDRS { text PT_LOAD FILEHDR PHDRS; }
+        SECTIONS {
+            . = SIZEOF_HEADERS;
+            PROVIDE(start = .);
+            .text : { *(.text) } :text
+            .data : { *(.data) } :text
+        }
+    ';
+    close(LD);
+
+    my @as = ($cross_prefix . "as", @asflags, "-o", $objfile, $asmfile);
+    system(@as) == 0 or die "system @as failed: $?";
+
+    my @ld = ($cross_prefix . "ld", "-o", $basename, "-T", $ldfile, $objfile);
+    system(@ld) == 0 or die "system @ld failed: $?";
+
+    if (!$keep) {
+        unlink $asmfile;
+        unlink $ldfile;
+        unlink $objfile;
+    }
 }
 
 # Progress bar implementation
