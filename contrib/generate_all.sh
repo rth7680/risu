@@ -78,8 +78,8 @@ fi
 
 mkdir -p ${TARGET_DIR}
 
-ALL_INSNS=$(cat ${RISU_FILE} | ag "^\w" | cut -f 1 -d " " | sort)
-COUNT=$(cat ${RISU_FILE=} | ag "^\w" | cut -f 1 -d " " | wc -l)
+ALL_INSNS=$(cat ${RISU_FILE} | grep "^[A-Za-z]" | cut -f 1 -d " " | sort)
+COUNT=$(cat ${RISU_FILE=} | grep "^[A-Za-z]" | cut -f 1 -d " " | wc -l)
 set -- $ALL_INSNS
 
 GROUP=$((COUNT / ${SPLIT}))
