@@ -375,75 +375,58 @@ sub write_random_arm_regdata($)
     printf "\tmsr\tAPSR_nzcvqg, #0\n";
 }
 
-sub write_random_aarch64_fpdata()
+sub write_random_aarch64_regdata($$)
 {
-    # load floating point / SIMD registers
-    printf "\t.data\n";
-    printf "\t.balign\t16\n";
-    printf "1:\n";
-
-    for (0..31) {
-        write_random_fpreg_var(4); # quad
-    }
-
-    printf "\t.text\n";
-    printf "\tadr\tx0, 1b\n";
-
-    for (my $rt = 0; $rt < 32; $rt += 4) {
-        printf "\tld1\t{v%d.2d-v%d.2d}, [x0], #64\n", $rt, $rt + 3;
-    }
-}
-
-sub write_random_aarch64_svedata()
-{
+    my ($fp_enabled, $sve_enabled) = @_;
     # Max SVE size
     my $vq = 16;
 
-    # Load SVE registers
+    # clear flags
+    printf "\tmsr\tnzcv, xzr\n";
+
     printf "\t.data\n";
     printf "\t.balign\t16\n";
     printf "1:\n";
 
-    for (my $i = 0; $i < 32 * 16 * $vq; $i += 16) {
-        write_random_fpreg_var(4); # quad
+    if ($sve_enabled) {
+        for (my $i = 0; $i < 32 * 16 * $vq; $i += 8) {
+            write_random_arm_fpreg();
+        }
+        for (my $i = 0; $i < 16 * 2 * $vq; $i += 4) {
+            write_data32(rand(0xffffffff));
+        }
+    } elsif ($fp_enabled) {
+        for (my $i = 0; $i < 32 * 16; $i += 8) {
+            write_random_arm_fpreg();
+        }
     }
-    for (my $i = 0; $i < 16 * 2 * $vq; $i += 4) {
+    for (my $i = 0; $i < 31 * 8; $i += 4) {
         write_data32(rand(0xffffffff));
     }
 
     printf "\t.text\n";
     printf "\tadr\tx0, 1b\n";
 
-    for (my $rt = 0; $rt <= 31; $rt++) {
-        printf "\tldr\tz%d, [x0, #%d, mul vl]\n", $rt, $rt;
-    }
-    write_add_rri(0, 0, 32 * 16 * $vq);
-
-    for (my $rt = 0; $rt <= 15; $rt++) {
-        printf "\tldr\tp%d, [x0, #%d, mul vl]\n", $rt, $rt;
-    }
-}
-
-sub write_random_aarch64_regdata($$)
-{
-    my ($fp_enabled, $sve_enabled) = @_;
-
-    # clear flags
-    printf "\tmsr\tnzcv, xzr\n";
-
-    # Load floating point / SIMD registers
-    # (one or the other as they overlap)
     if ($sve_enabled) {
-        write_random_aarch64_svedata();
+        for (my $rt = 0; $rt <= 31; $rt++) {
+            printf "\tldr\tz%d, [x0, #%d, mul vl]\n", $rt, $rt;
+        }
+        write_add_rri(0, 0, 32 * 16 * $vq);
+
+        for (my $rt = 0; $rt <= 15; $rt++) {
+            printf "\tldr\tp%d, [x0, #%d, mul vl]\n", $rt, $rt;
+        }
+        write_add_rri(0, 0, 16 * 2 * $vq);
     } elsif ($fp_enabled) {
-        write_random_aarch64_fpdata();
+        for (my $rt = 0; $rt < 32; $rt += 4) {
+            printf "\tld1\t{v%d.2d-v%d.2d}, [x0], #64\n", $rt, $rt + 3;
+        }
     }
 
-    # general purpose registers
-    for (my $i = 0; $i <= 30; $i++) {
-        # TODO full 64 bit pattern instead of 32
-        write_mov_ri($i, rand(0xffffffff));
+    for (my $rt = 29; $rt > 0; $rt -= 2) {
+        printf "\tldp\tx%d, x%d, [x0], #16\n", $rt, $rt + 1;
     }
+    printf "\tldr\tx0, [x0]\n";
 }
 
 sub write_random_register_data($$)
