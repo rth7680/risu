@@ -26,19 +26,8 @@ require Exporter;
 our @ISA    = qw(Exporter);
 our @EXPORT = qw(write_test_code);
 
-# Note that we always start in ARM mode even if the C code was compiled for
-# thumb because we are called by branch to a lsbit-clear pointer.
-# is_thumb tracks the mode we're actually currently in (ie should we emit
-# an arm or thumb insn?); test_thumb tells us which mode we need to switch
-# to to emit the insns under test.
-# Use .mode aarch64 to start in Aarch64 mode.
-
 my $is_aarch64 = 0; # are we in aarch64 mode?
-# For aarch64 it only makes sense to put the mode directive at the
-# beginning, and there is no switching away from aarch64 to arm/thumb.
-
-my $is_thumb = 0;   # are we currently in Thumb mode?
-my $test_thumb = 0; # should test code be Thumb mode?
+my $is_thumb = 0;   # are we in Thumb mode?
 
 # Maximum alignment restriction permitted for a memory op.
 my $MAXALIGN = 64;
@@ -132,46 +121,6 @@ sub write_data32($)
 {
     my ($data) = @_;
     printf "\t.word\t%#08x\n", $data;
-}
-
-sub write_switch_to_thumb()
-{
-    # Switch to thumb if we're not already there
-    if (!$is_thumb) {
-        # Note that we have to clean up R0 afterwards so it isn't
-        # tainted with a value which depends on PC.
-        printf "\tadd\tr0, pc, #1\n";
-        printf "\tbx\tr0\n";
-        printf ".thumb\n";
-        printf "\teors\tr0, r0\n";
-        $is_thumb = 1;
-    }
-}
-
-sub write_switch_to_arm()
-{
-    # Switch to ARM mode if we are in thumb mode
-    if ($is_thumb) {
-        printf "\t.balign\t4\n";
-        printf "\tbx\tpc\n";
-        printf "\tnop\n";
-        printf ".arm\n";
-        $is_thumb = 0;
-    }
-}
-
-sub write_switch_to_test_mode()
-{
-    # Switch to whichever mode we need for test code
-    if ($is_aarch64) {
-        return; # nothing to do
-    }
-
-    if ($test_thumb) {
-        write_switch_to_thumb();
-    } else {
-        write_switch_to_arm();
-    }
 }
 
 sub write_add_rri($$$)
@@ -345,7 +294,14 @@ sub write_random_arm_regdata($)
 {
     my ($fp_enabled) = @_;
     my $vfp = $fp_enabled ? 2 : 0; # 0 : no vfp, 1 : vfpd16, 2 : vfpd32
-    write_switch_to_arm();
+
+    # clear the flags (NZCVQ and GE)
+    if ($is_thumb) {
+        printf "\tmovw\tr0, #0\n";
+        printf "\tmsr\tAPSR_nzcvqg, r0\n";
+    } else {
+        printf "\tmsr\tAPSR_nzcvqg, #0\n";
+    }
 
     # initialise all registers
     printf "\tadr\tr0, 0f\n";
@@ -370,9 +326,6 @@ sub write_random_arm_regdata($)
         printf "\tvldmia\tr0!, {d16-d31}\n";
     }
     printf "\tldmia\tr0, {r0-r12,r14}\n";
-
-    # clear the flags (NZCVQ and GE)
-    printf "\tmsr\tAPSR_nzcvqg, #0\n";
 }
 
 sub write_random_aarch64_regdata($$)
@@ -447,7 +400,6 @@ sub write_memblock_setup()
     # Write code which sets up the memory block for loads and stores.
     # We set r0 to point to a block of 8K length
     # of random data, aligned to the maximum desired alignment.
-    write_switch_to_arm();
 
     printf "\tadr\t%s, 2f\n", xr(0);
     if ($is_aarch64) {
@@ -475,7 +427,6 @@ sub write_memblock_setup()
 sub write_set_fpscr_arm($)
 {
     my ($fpscr) = @_;
-    write_switch_to_arm();
     write_mov_ri(0, $fpscr);
     printf "\tvmsr\tfpscr, r0\n";
 }
@@ -824,13 +775,13 @@ sub write_test_code($$$$$$$$)
     my $subarch = $params->{ 'subarch' };
 
     if ($subarch && $subarch eq 'aarch64') {
-        $test_thumb = 0;
+        $is_thumb = 0;
         $is_aarch64 = 1;
     } elsif ($subarch && $subarch eq 'thumb') {
-        $test_thumb = 1;
+        $is_thumb = 1;
         $is_aarch64 = 0;
     } else {
-        $test_thumb = 0;
+        $is_thumb = 0;
         $is_aarch64 = 0;
     }
 
@@ -849,9 +800,17 @@ sub write_test_code($$$$$$$$)
     printf "\t.text\n";
     if (!$is_aarch64) {
 	printf "\t.syntax unified\n";
-        printf "\t.arm\n";
         printf "\t.arch armv7-a\n";
         printf "\t.fpu neon\n" if ($fp_enabled);
+
+        # We always start in ARM mode even if the C code was compiled for
+        # thumb because we are called by branch to a lsbit-clear pointer.
+        printf ".arm\n";
+        if ($is_thumb) {
+            printf "\tadd\tr0, pc, #1\n";
+            printf "\tbx\tr0\n";
+            printf ".thumb\n";
+        }
     }
 
     # convert from probability that insn will be conditional to
@@ -873,7 +832,6 @@ sub write_test_code($$$$$$$$)
     }
     # memblock setup doesn't clean its registers, so this must come afterwards.
     write_random_register_data($fp_enabled, $sve_enabled);
-    write_switch_to_test_mode();
 
     for my $i (1..$numinsns) {
         my $insn_enc = $keys[int rand (@keys)];
@@ -885,7 +843,6 @@ sub write_test_code($$$$$$$$)
         # for the VFP registers to decay to NaNs and zeroes.
         if (($i % 100) == 0) {
             write_random_register_data($fp_enabled, $sve_enabled);
-            write_switch_to_test_mode();
         }
         progress_update($i);
     }
