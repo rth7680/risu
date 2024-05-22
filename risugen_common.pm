@@ -76,7 +76,7 @@ sub progress_start($$)
     ($proglen, $progmax) = @_;
     $proglen -= 2; # allow for [] chars
     $| = 1;        # disable buffering so we can see the meter...
-    print "[" . " " x $proglen . "]\r";
+    print STDOUT "[" . " " x $proglen . "]\r";
     $lastprog = 0;
 }
 
@@ -87,13 +87,13 @@ sub progress_update($)
     my $barlen = int($proglen * $done / $progmax);
     if ($barlen != $lastprog) {
         $lastprog = $barlen;
-        print "[" . "-" x $barlen . " " x ($proglen - $barlen) . "]\r";
+        print STDOUT "[" . "-" x $barlen . " " x ($proglen - $barlen) . "]\r";
     }
 }
 
 sub progress_end()
 {
-    print "[" . "-" x $proglen . "]\n";
+    print STDOUT "[" . "-" x $proglen . "]\n";
     $| = 0;
 }
 
@@ -124,7 +124,7 @@ sub eval_with_fields($$$$$) {
     $evalstr .= "}";
     my $v = eval $evalstr;
     if ($@) {
-        print "Syntax error detected evaluating $insnname $blockname string:\n$block\n$@";
+        print STDERR "Syntax error detected evaluating $insnname $blockname string:\n$block\n$@";
         exit(1);
     }
     return $v;
@@ -163,20 +163,20 @@ sub dump_insn_details($$)
 {
     # Dump the instruction details for one insn
     my ($insn, $rec) = @_;
-    print "insn $insn: ";
+    print STDOUT "insn $insn: ";
     my $insnwidth = $rec->{width};
     my $fixedbits = $rec->{fixedbits};
     my $fixedbitmask = $rec->{fixedbitmask};
     my $constraint = $rec->{blocks}{"constraints"};
-    print sprintf(" insnwidth %d fixedbits %08x mask %08x ", $insnwidth, $fixedbits, $fixedbitmask);
+    print STDOUT sprintf(" insnwidth %d fixedbits %08x mask %08x ", $insnwidth, $fixedbits, $fixedbitmask);
     if (defined $constraint) {
-        print "constraint $constraint ";
+        print STDOUT "constraint $constraint ";
     }
     for my $tuple (@{ $rec->{fields} }) {
         my ($var, $pos, $mask) = @$tuple;
-        print "($var, $pos, " . sprintf("%08x", $mask) . ") ";
+        print STDOUT "($var, $pos, " . sprintf("%08x", $mask) . ") ";
     }
-    print "\n";
+    print STDOUT "\n";
 }
 
 1;
