@@ -119,3 +119,39 @@ FEXPAND         VIS1 10 rd:5 110110 00000 0 0100 1101 rs2:5
 # ALIGNADDRL    VIS1 10 rd:5 110110 rs1:5 0 0001 1010 rs2:5 \
 #     !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
 # FALIGNDATAg   VIS1 10 rd:5 110110 rs1:5 0 0100 1000 rs2:5
+
+#
+# VIS2
+#
+
+EDGE8N          VIS2 10 rd:5 110110 rs1:5 0 0000 0001 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE8LN         VIS2 10 rd:5 110110 rs1:5 0 0000 0011 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE16N         VIS2 10 rd:5 110110 rs1:5 0 0000 0101 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE16LN        VIS2 10 rd:5 110110 rs1:5 0 0000 0111 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE32N         VIS2 10 rd:5 110110 rs1:5 0 0000 1001 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+EDGE32LN        VIS2 10 rd:5 110110 rs1:5 0 0000 1011 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+
+# %gsr not handled by risu
+# BMASK         VIS2 10 rd:5 110110 rs1:5 0 0001 1001 rs2:5 \
+#     !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+# BSHUFFLE      VIS2 10 rd:5 110110 rs1:5 0 0100 1100 rs2:5
+# SIAM          VIS2 10 00000 110110 00000 010000001 00 mode:3
+
+#
+# FMAF
+#
+
+FMADDs          FMAF 10 rd:5 110111 rs1:5 rs3:5 0001 rs2:5
+FMADDd          FMAF 10 rd:5 110111 rs1:5 rs3:5 0010 rs2:5
+FMSUBs          FMAF 10 rd:5 110111 rs1:5 rs3:5 0101 rs2:5
+FMSUBd          FMAF 10 rd:5 110111 rs1:5 rs3:5 0110 rs2:5
+FNMSUBs         FMAF 10 rd:5 110111 rs1:5 rs3:5 1001 rs2:5
+FNMSUBd         FMAF 10 rd:5 110111 rs1:5 rs3:5 1010 rs2:5
+FNMADDs         FMAF 10 rd:5 110111 rs1:5 rs3:5 1101 rs2:5
+FNMADDd         FMAF 10 rd:5 110111 rs1:5 rs3:5 1110 rs2:5
