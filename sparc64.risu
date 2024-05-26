@@ -155,3 +155,91 @@ FNMSUBs         FMAF 10 rd:5 110111 rs1:5 rs3:5 1001 rs2:5
 FNMSUBd         FMAF 10 rd:5 110111 rs1:5 rs3:5 1010 rs2:5
 FNMADDs         FMAF 10 rd:5 110111 rs1:5 rs3:5 1101 rs2:5
 FNMADDd         FMAF 10 rd:5 110111 rs1:5 rs3:5 1110 rs2:5
+
+#
+# VIS3
+#
+
+ADDXC           VIS3 10 rd:5 110110 rs1:5 0 0001 00 cc 1 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+
+FCHKSM16        VIS3 10 rd:5 110110 rs1:5 0 0100 0100 rs2:5
+FMEAN16         VIS3 10 rd:5 110110 rs1:5 0 0100 0000 rs2:5
+
+FHADDs          VIS3 10 rd:5 110100 rs1:5 0 0110 0001 rs2:5
+FHADDd          VIS3 10 rd:5 110100 rs1:5 0 0110 0010 rs2:5
+FHSUBs          VIS3 10 rd:5 110100 rs1:5 0 0110 0101 rs2:5
+FHSUBd          VIS3 10 rd:5 110100 rs1:5 0 0110 0110 rs2:5
+FNHADDs         VIS3 10 rd:5 110100 rs1:5 0 0111 0001 rs2:5
+FNHADDd         VIS3 10 rd:5 110100 rs1:5 0 0111 0010 rs2:5
+
+FNADDs          VIS3 10 rd:5 110100 rs1:5 0 0101 0001 rs2:5
+FNADDd          VIS3 10 rd:5 110100 rs1:5 0 0101 0010 rs2:5
+FNMULs          VIS3 10 rd:5 110100 rs1:5 0 0101 1001 rs2:5
+FNMULd          VIS3 10 rd:5 110100 rs1:5 0 0101 1010 rs2:5
+
+FPADD64         VIS3 10 rd:5 110110 rs1:5 0 0100 0010 rs2:5
+FPSUB64         VIS3 10 rd:5 110110 rs1:5 0 0100 0110 rs2:5
+
+FPADDS16        VIS3 10 rd:5 110110 rs1:5 0 0101 1000 rs2:5
+FPADDS16s       VIS3 10 rd:5 110110 rs1:5 0 0101 1001 rs2:5
+FPADDS32        VIS3 10 rd:5 110110 rs1:5 0 0101 1010 rs2:5
+FPADDS32s       VIS3 10 rd:5 110110 rs1:5 0 0101 1011 rs2:5
+FPSUBS16        VIS3 10 rd:5 110110 rs1:5 0 0101 1100 rs2:5
+FPSUBS16s       VIS3 10 rd:5 110110 rs1:5 0 0101 1101 rs2:5
+FPSUBS32        VIS3 10 rd:5 110110 rs1:5 0 0101 1110 rs2:5
+FPSUBS32s       VIS3 10 rd:5 110110 rs1:5 0 0101 1111 rs2:5
+
+FPCMPULE8       VIS3 10 rd:5 110110 rs1:5 1 0010 0000 rs2:5 \
+    !constraints { reg_ok($rd) }
+FPCMPUGT8       VIS3 10 rd:5 110110 rs1:5 1 0010 1000 rs2:5 \
+    !constraints { reg_ok($rd) }
+FPCMPEQ8        VIS3 10 rd:5 110110 rs1:5 1 0010 0010 rs2:5 \
+    !constraints { reg_ok($rd) }
+FPCMPNE8        VIS3 10 rd:5 110110 rs1:5 1 0010 1010 rs2:5 \
+    !constraints { reg_ok($rd) }
+
+FSLL16          VIS3 10 rd:5 110110 rs1:5 0 0010 0001 rs2:5
+FSRL16          VIS3 10 rd:5 110110 rs1:5 0 0010 0011 rs2:5
+FSLAS16         VIS3 10 rd:5 110110 rs1:5 0 0010 1001 rs2:5
+FSRA16          VIS3 10 rd:5 110110 rs1:5 0 0010 1011 rs2:5
+FSLL32          VIS3 10 rd:5 110110 rs1:5 0 0010 0101 rs2:5
+FSRL32          VIS3 10 rd:5 110110 rs1:5 0 0010 0111 rs2:5
+FSLAS32         VIS3 10 rd:5 110110 rs1:5 0 0010 1101 rs2:5
+FSRA32          VIS3 10 rd:5 110110 rs1:5 0 0010 1111 rs2:5
+
+LZCNT           VIS3 10 rd:5 110110 00000 0 0001 0111 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs2); }
+
+PDISTN          VIS3 10 rd:5 110110 rs1:5 0 0011 1111 rs2:5 \
+    !constraints { reg_ok($rd) }
+
+UMULXHI         VIS3 10 rd:5 110110 rs1:5 0 0001 0110 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+XMULX           VIS3 10 rd:5 110110 rs1:5 1 0001 0101 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+XMULXHI         VIS3 10 rd:5 110110 rs1:5 1 0001 0110 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+
+MOVsTOuw        VIS3 10 rd:5 110110 00000 1 0001 0001 rs2:5 \
+    !constraints { reg_ok($rd) }
+MOVsTOsw        VIS3 10 rd:5 110110 00000 1 0001 0011 rs2:5 \
+    !constraints { reg_ok($rd) }
+MOVwTOs         VIS3 10 rd:5 110110 00000 1 0001 1001 rs2:5 \
+    !constraints { reg_ok($rs2) }
+MOVdTOx         VIS3 10 rd:5 110110 00000 1 0001 0000 rs2:5 \
+    !constraints { reg_ok($rd) }
+MOVxTOd         VIS3 10 rd:5 110110 00000 1 0001 1000 rs2:5 \
+    !constraints { reg_ok($rs2) }
+
+# Defer
+# LDXEFSR_r     VIS3 11 00011 100001 rs1:5 0 00000000 rs2:5
+# LDXEFSR_i     VIS3 11 00011 100001 rs1:5 1 simm:13
+
+# %gsr not handled by risu
+# CMASK8          VIS3 10 00000 110110 00000 0 0001 1011 rs2:5 \
+#     !constraints { reg_ok($rs2); }
+# CMASK16         VIS3 10 00000 110110 00000 0 0001 1101 rs2:5 \
+#     !constraints { reg_ok($rs2); }
+# CMASK32         VIS3 10 00000 110110 00000 0 0001 1111 rs2:5 \
+#     !constraints { reg_ok($rs2); }
