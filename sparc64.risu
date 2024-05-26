@@ -250,3 +250,49 @@ MOVxTOd         VIS3 10 rd:5 110110 00000 1 0001 1000 rs2:5 \
 
 FPMADDX         IMA 10 rd:5 110111 rs1:5 rs3:5 0000 rs2:5
 FPMADDXHI       IMA 10 rd:5 110111 rs1:5 rs3:5 0100 rs2:5
+
+#
+# VIS4
+#
+
+SUBXC           VIS4 10 rd:5 110110 rs1:5 0 0100 00 cc 1 rs2:5 \
+    !constraints { reg_ok($rd) && reg_ok($rs1) && reg_ok($rs2); }
+
+FPADD8          VIS4 10 rd:5 110110 rs1:5 1 0010 0100 rs2:5
+FPADDS8         VIS4 10 rd:5 110110 rs1:5 1 0010 0110 rs2:5
+FPADDUS8        VIS4 10 rd:5 110110 rs1:5 1 0010 0111 rs2:5
+FPADDUS16       VIS4 10 rd:5 110110 rs1:5 1 0010 0011 rs2:5
+FPSUB8          VIS4 10 rd:5 110110 rs1:5 1 0101 0100 rs2:5
+FPSUBS8         VIS4 10 rd:5 110110 rs1:5 1 0101 0110 rs2:5
+FPSUBUS8        VIS4 10 rd:5 110110 rs1:5 1 0101 0111 rs2:5
+FPSUBUS16       VIS4 10 rd:5 110110 rs1:5 1 0101 0011 rs2:5
+
+FPMIN8          VIS4 10 rd:5 110110 rs1:5 1 0001 1010 rs2:5
+FPMIN16         VIS4 10 rd:5 110110 rs1:5 1 0001 1011 rs2:5
+FPMIN32         VIS4 10 rd:5 110110 rs1:5 1 0001 1100 rs2:5
+FPMINU8         VIS4 10 rd:5 110110 rs1:5 1 0101 1010 rs2:5
+FPMINU16        VIS4 10 rd:5 110110 rs1:5 1 0101 1011 rs2:5
+FPMINU32        VIS4 10 rd:5 110110 rs1:5 1 0101 1100 rs2:5
+
+FPMAX8          VIS4 10 rd:5 110110 rs1:5 1 0001 1101 rs2:5
+FPMAX16         VIS4 10 rd:5 110110 rs1:5 1 0001 1110 rs2:5
+FPMAX32         VIS4 10 rd:5 110110 rs1:5 1 0001 1111 rs2:5
+FPMAXU8         VIS4 10 rd:5 110110 rs1:5 1 0101 1101 rs2:5
+FPMAXU16        VIS4 10 rd:5 110110 rs1:5 1 0101 1110 rs2:5
+FPMAXU32        VIS4 10 rd:5 110110 rs1:5 1 0101 1111 rs2:5
+
+FPCMPLE8        VIS4 10 rd:5 110110 rs1:5 0 0011 0100 rs2:5 \
+    !constraints { reg_ok($rd) }
+FPCMPGT8        VIS4 10 rd:5 110110 rs1:5 0 0011 1100 rs2:5 \
+    !constraints { reg_ok($rd) }
+FPCMPULE16      VIS4 10 rd:5 110110 rs1:5 1 0010 1110 rs2:5 \
+    !constraints { reg_ok($rd) }
+FPCMPUGT16      VIS4 10 rd:5 110110 rs1:5 1 0010 1011 rs2:5 \
+    !constraints { reg_ok($rd) }
+FPCMPULE32      VIS4 10 rd:5 110110 rs1:5 1 0010 1111 rs2:5 \
+    !constraints { reg_ok($rd) }
+FPCMPUGT32      VIS4 10 rd:5 110110 rs1:5 1 0010 1100 rs2:5 \
+    !constraints { reg_ok($rd) }
+
+FALIGNDATAi     VIS4 10 rd:5 110110 rs1:5 0 0100 1001 rs2:5 \
+    !constraints { reg_ok($rs1); }
