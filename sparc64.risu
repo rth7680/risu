@@ -243,3 +243,10 @@ MOVxTOd         VIS3 10 rd:5 110110 00000 1 0001 1000 rs2:5 \
 #     !constraints { reg_ok($rs2); }
 # CMASK32         VIS3 10 00000 110110 00000 0 0001 1111 rs2:5 \
 #     !constraints { reg_ok($rs2); }
+
+#
+# IMA
+#
+
+FPMADDX         IMA 10 rd:5 110111 rs1:5 rs3:5 0000 rs2:5
+FPMADDXHI       IMA 10 rd:5 110111 rs1:5 rs3:5 0100 rs2:5
