@@ -1887,7 +1887,7 @@ SMSUBL A64 1 00 11011 001 rm:5 1 ra:5 rn:5 rd:5 \
 
 SMNEGL A64 1 00 11011 001 rm:5 1 11111 rn:5 rd:5
 
-SMULH A64 1 00 11011 010 rm:5 0 ra:5 rn:5 rd:5
+SMULH A64 1 00 11011 010 rm:5 0 11111 rn:5 rd:5
 
 UMADDL A64 1 00 11011 101 rm:5 0 ra:5 rn:5 rd:5 \
 !constraints { $ra != 31; }
@@ -1899,7 +1899,7 @@ UMSUBL A64 1 00 11011 101 rm:5 1 ra:5 rn:5 rd:5 \
 
 UMNEGL A64 1 00 11011 101 rm:5 1 11111 rn:5 rd:5
 
-UMULH A64 1 00 11011 110 rm:5 0 ra:5 rn:5 rd:5
+UMULH A64 1 00 11011 110 rm:5 0 11111 rn:5 rd:5
 
 # - Logical (shifted register)
 # 31|30 29| 28 27 26 25 24 |23 22| 21| 20    16 15      10 9    5 4    0
